@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI核心知识测试题 / AI Core Knowledge Quiz</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --blue: #007bff;
+            --green: #28a745;
+            --red: #dc3545;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #333333;
+            --text-muted: #6c757d;
+        }
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.05);
+        }
+        h1 {
+            text-align: center;
+            color: var(--primary);
+            border-bottom: 2px solid #eee;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+        }
+        .header-en {
+            display: block;
+            font-size: 0.6em;
+            color: var(--text-muted);
+            font-weight: normal;
+            margin-top: 5px;
+        }
+        .question-card {
+            background: #fff;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .question-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        .bilingual {
+            display: block;
+            font-size: 0.85em;
+            color: var(--text-muted);
+            font-weight: normal;
+            margin-top: 4px;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .option {
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #fdfdfd;
+        }
+        .option:hover {
+            border-color: #b8daff;
+            background: #f1f7ff;
+        }
+        .option.selected {
+            border-color: var(--blue);
+            background: #e7f1ff;
+        }
+        .option.correct {
+            border-color: #28a745;
+            background: #d4edda;
+            position: relative;
+        }
+        .option.correct::after {
+            content: "✓";
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #dc3545;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        .option.incorrect {
+            border-color: #f5c6cb;
+            background: #fde2e5;
+            position: relative;
+        }
+        .option.incorrect::after {
+            content: "✗";
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #dc3545;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        .feedback {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-left: 5px solid var(--blue);
+            border-radius: 4px;
+            font-size: 0.95em;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .correct-answer-text {
+            color: var(--green);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #eee;
+        }
+        button {
+            padding: 12px 25px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            color: white;
+            transition: opacity 0.2s;
+        }
+        button:hover { opacity: 0.9; }
+        .btn-submit { background-color: var(--blue); }
+        .btn-reset { background-color: var(--text-muted); }
+        .btn-export { background-color: var(--red); display: none; }
+        
+        #result-area {
+            display: none;
+            margin-top: 30px;
+            padding: 25px;
+            background: #fff8e5;
+            border: 1px solid #ffeeba;
+            border-radius: 8px;
+        }
+        .error-list { margin-top: 20px; }
+        .error-item {
+            background: #fff;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid var(--red);
+            margin-bottom: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            .container { padding: 15px; }
+            button { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>
+        AI时代核心知识综合测试
+        <span class="header-en">Comprehensive Core Knowledge Quiz in the AI Era</span>
+    </h1>
+    
+    <div id="quiz-container">
+        <!-- Questions will be injected here via JavaScript -->
+    </div>
+
+    <div class="controls">
+        <button class="btn-submit" onclick="submitQuiz()">提交并评分 / Submit & Score</button>
+        <button class="btn-reset" onclick="resetQuiz()">清空重置 / Reset All</button>
+        <button class="btn-export" id="btn-export" onclick="exportErrors()">导出错题本 / Export Errors (TXT)</button>
+    </div>
+
+    <div id="result-area"></div>
+</div>
+
+<script>
+// 题库数据 / Quiz Data
+const qData = [
+    {
+        qZ: "大语言模型产生“幻觉”的本质原因是什么？",
+        qE: "What is the fundamental nature of 'hallucinations' in Large Language Models?",
+        oZ: ["硬件过热导致的计算错误", "强行在现有输入数据的基础上构建自洽的价值观", "训练数据中包含了过多的科幻小说", "检索外部数据库时遭遇网络延迟"],
+        oE: ["Hardware overheating", "Forcing a consistent worldview based on existing input data", "Too much sci-fi in training data", "Network latency during retrieval"],
+        a: 1,
+        eZ: "大语言模型本质是要在现有输入数据的基础上，强行构建一个自洽的价值观。幻觉可以看成是自洽后的自然体现。",
+        eE: "LLMs fundamentally try to build a consistent worldview based on input data. Hallucinations are a natural manifestation of achieving this self-consistency."
+    },
+    {
+        qZ: "根据JD万斯的演讲，欧盟过度监管AI的真实目的是什么？",
+        qE: "According to JD Vance's speech, what is the true intent behind the EU's strict AI regulations?",
+        oZ: ["保护人类免受AGI的伤害", "防止他人创业以保护既得利益者", "提高AI模型的能效比", "解决版权纠纷"],
+        oE: ["Protect humans from AGI", "Prevent others from starting businesses to protect vested interests", "Improve AI energy efficiency", "Resolve copyright disputes"],
+        a: 1,
+        eZ: "JD万斯直言不讳地指出，增加监管的都是既得利益者，他们的目的是防止他人创业，这精准诊断了欧盟的现状。",
+        eE: "Vance explicitly pointed out that those pushing for regulation are vested interests aiming to prevent others from starting businesses, accurately diagnosing the EU's situation."
+    },
+    {
+        qZ: "从第一性原理出发，人类追求事业、爱情、地位的本质原因是什么？",
+        qE: "From first principles, what is the fundamental reason humans pursue career, love, and status?",
+        oZ: ["它们是为了完成“生存与繁衍”主线任务而演化出的核心策略", "为了获得每天2000大卡的能量", "它们是脱离了生物学限制的可选娱乐支线", "为了抵抗熵增的纯粹哲学追求"],
+        oE: ["They are core strategies evolved to complete the main quest of 'survival and reproduction'", "To obtain 2000 calories daily", "They are optional entertainment side quests free from biology", "Pure philosophical pursuit against entropy"],
+        a: 0,
+        eZ: "事业、金钱、声望等并非与主线并列的“支线”，而是人类为了完成个体生存和基因延续（繁衍）而演化出的核心策略和竞争工具。",
+        eE: "Careers, money, and prestige are not optional 'side quests' but core strategies and competitive tools evolved to ensure individual survival and gene propagation."
+    },
+    {
+        qZ: "为什么Anthropic将模型版本从3.5直接跳到了3.7？",
+        qE: "Why did Anthropic jump its model version directly from 3.5 to 3.7?",
+        oZ: ["3.6版本在内部测试中表现极差被废弃", "外界社区习惯性把一个未命名版本称为3.6，官方顺应了社区习惯", "为了在数字上压倒GPT-4.5", "3.6是专门供给军方的机密版本"],
+        oE: ["Version 3.6 performed poorly in internal tests and was scrapped", "The community habitually called an interim version 3.6, and the company followed the community's naming", "To numerically outshine GPT-4.5", "3.6 is a classified military version"],
+        a: 1,
+        eZ: "根据姚顺宇的访谈，Anthropic早期产品力较弱，外界为了区分自发把某次更新叫3.6，后来Anthropic顺应社区习惯将下一个版本定为3.7。",
+        eE: "According to Yao Shunyu's interview, the community spontaneously named an update 3.6. Anthropic followed this community habit and named the next release 3.7."
+    },
+    {
+        qZ: "保罗·格雷厄姆（Paul Graham）认为在AI时代坚持写作的意义是什么？",
+        qE: "What does Paul Graham believe is the significance of persisting in writing in the AI era?",
+        oZ: ["写作不仅仅是输出文字，更是一个思考的过程", "为了训练更好的开源模型", "保留人类专属的排版艺术", "证明人类比AI语法更准确"],
+        oE: ["Writing is not just outputting text; it is a thinking process", "To train better open-source models", "To preserve human-exclusive typography", "To prove humans have better grammar than AI"],
+        a: 0,
+        eZ: "保罗·格雷厄姆强调，写作不仅仅是输出文字，更是一个思考的过程，AI时代坚持写作的人是真正的“聪明人”。",
+        eE: "Graham emphasizes that writing is not just outputting words but a thinking process. Those who persist in writing are the true 'smart people'."
+    },
+    {
+        qZ: "为什么AI大模型在短短一年内做高考数学题的分数从47分暴涨到接近满分？",
+        qE: "Why did AI models' scores on college entrance math exams surge from 47 to near-perfect in just one year?",
+        oZ: ["因为它们记忆了所有的历年真题库", "得益于“思维链(CoT)”与“强化学习(RL)”结合的推理模型爆发", "因为增加了视觉识别模块", "因为运算速度提升了100倍"],
+        oE: ["Because they memorized all past exam databases", "Thanks to the explosion of reasoning models combining Chain of Thought (CoT) and Reinforcement Learning (RL)", "Because visual recognition modules were added", "Because computing speed increased 100x"],
+        a: 1,
+        eZ: "推理模型（如o1、DeepSeek R1、豆包深度思考）通过思维链拆解步骤，结合强化学习不断试错积累策略，让数学能力发生了质的飞跃。",
+        eE: "Reasoning models use Chain of Thought to break down steps and Reinforcement Learning to refine strategies, leading to a qualitative leap in math capabilities."
+    },
+    {
+        qZ: "DeepSeek团队最核心的战略基因是什么？",
+        qE: "What is the core strategic DNA of the DeepSeek team?",
+        oZ: ["不惜一切代价追求AGI，无视成本", "专注于降低训练和推理成本，把有限资源放在最核心的智能提升上", "依靠海量营销推广建立生态闭环", "彻底放弃大模型，只做小众端侧应用"],
+        oE: ["Pursue AGI at all costs, ignoring expenses", "Focus on lowering training/inference costs, concentrating limited resources on core intelligence", "Rely on massive marketing to build an ecosystem", "Abandon large models for niche edge apps"],
+        a: 1,
+        eZ: "DeepSeek的核心基因是省钱与高效，不管别人花多少钱，自己拼尽全力通过MoE和MLA架构降低成本，专注智能本身。",
+        eE: "DeepSeek's core DNA is cost-efficiency. They use MoE and MLA architectures to dramatically lower costs while strictly focusing on core intelligence."
+    },
+    {
+        qZ: "为什么在企业应用中，优先推荐使用RAG（检索增强生成）而不是微调（Fine-tuning）模型？",
+        qE: "Why is RAG (Retrieval-Augmented Generation) generally preferred over Fine-tuning in enterprise applications?",
+        oZ: ["因为RAG成本更低、易实施，且对文档检索有更精细的控制", "因为微调会永久破坏模型的语言能力", "因为RAG不需要任何算力", "因为微调目前是非法的"],
+        oE: ["Because RAG is cheaper, easier to implement, and offers finer control over document retrieval", "Because fine-tuning permanently destroys the model's language ability", "Because RAG requires zero compute", "Because fine-tuning is currently illegal"],
+        a: 0,
+        eZ: "大部分时候不需要微调。RAG便宜、实施简单，还能提供对信息源的精确控制，避免模型胡编乱造。",
+        eE: "Most of the time, fine-tuning isn't needed. RAG is cheaper, easier to implement, and provides precise control over info sources to prevent hallucinations."
+    },
+    {
+        qZ: "根据ChatGPT负责人的访谈，ChatGPT最初是如何诞生的？",
+        qE: "According to the Head of ChatGPT, how was ChatGPT originally born?",
+        oZ: ["经过三年的严密商业规划", "为了对抗谷歌搜索而设立的最高机密项目", "一个原本打算在假期后关闭的黑客马拉松项目", "应美国政府要求开发的情报工具"],
+        oE: ["After three years of strict business planning", "A top-secret project to destroy Google Search", "A hackathon project they planned to shut down after the holidays", "An intel tool requested by the US government"],
+        a: 2,
+        eZ: "Nick Turley分享说，ChatGPT的成功是个意外，它最初只是一个黑客马拉松项目，原计划在假期后就关闭。",
+        eE: "Nick Turley shared that ChatGPT's success was an accident. It started as a hackathon project they planned to shut down after the holidays."
+    },
+    {
+        qZ: "OpenAI最初为什么决定亲自做一个“聊天机器人（Chatbot）”？",
+        qE: "Why did OpenAI originally decide to build a 'chatbot' themselves?",
+        oZ: ["因为API太难商业化，合作伙伴不知道怎么用", "为了收集用户的隐私数据", "为了炫耀他们的前端设计能力", "因为聊天机器人不需要消耗算力"],
+        oE: ["Because the API was too hard to commercialize and partners didn't know how to use it", "To collect user privacy data", "To show off their frontend design skills", "Because chatbots don't require compute"],
+        a: 0,
+        eZ: "Mira Murati提到，他们最初以为只卖API就行，但发现合作伙伴很难将这种通用技术转化为实用产品，所以才决定自己下场做产品。",
+        eE: "Mira Murati mentioned they initially thought selling the API was enough, but partners struggled to commercialize the raw tech, forcing OpenAI to build a product."
+    },
+    {
+        qZ: "在强化学习中，采用“过程奖励（Process Reward）”的一个主要风险是什么？",
+        qE: "What is a major risk of using 'Process Reward' in reinforcement learning?",
+        oZ: ["训练速度太快导致硬件烧毁", "容易被模型“钻空子（Reward Hack）”，制造高分的假象而没真正学习", "会导致模型丧失多语言能力", "它需要人类手动审查每一个Token"],
+        oE: ["Training is so fast it burns hardware", "Prone to 'reward hacking', where the model fakes a high score without truly learning", "It causes the model to lose multilingual abilities", "It requires humans to manually review every token"],
+        a: 1,
+        eZ: "过程分容易被reward hack，模型可能会制造出高reward的假象，但并没有真正学习到解决问题的根本逻辑。",
+        eE: "Process rewards are easily 'hacked'. The model might fake a high-reward process without truly learning the underlying logic."
+    },
+    {
+        qZ: "关于Transformer架构的成功，神经科学领域的最新研究提出了什么可能的原因？",
+        qE: "What possible reason for the success of the Transformer architecture has recent neuroscience research proposed?",
+        oZ: ["它完全违背了生物学原理", "它无意中重新发现了大脑皮层核心的“树突计算”原理", "它的计算方式与人类肠道神经元一致", "它是外星文明遗留的算法"],
+        oE: ["It completely violates biological principles", "It inadvertently rediscovered the 'dendritic computing' principles of the human cortex", "It computes identically to human gut neurons", "It's an algorithm left by aliens"],
+        a: 1,
+        eZ: "最新论文指出，Transformer可能无意中重新发现了大脑皮层核心的、经过亿万年优化的“树突计算”原理。",
+        eE: "Recent papers suggest Transformers might have inadvertently rediscovered 'dendritic computing', a core principle optimized in the human cortex over millions of years."
+    },
+    {
+        qZ: "关于大模型发展中所谓的“Scaling Law撞墙（遇到瓶颈）”，一线研究员姚顺宇的看法是什么？",
+        qE: "Regarding the narrative that 'Scaling Laws hit a wall', what is the view of top researcher Yao Shunyu?",
+        oZ: ["物理学定律决定了算力无法再增加", "数据已经彻底耗尽，无法再训练", "多数情况下只是因为代码里有Bug没修好", "人类的智商已经限制了AI的发展"],
+        oE: ["Laws of physics prevent compute from increasing", "Data is completely exhausted", "In most cases, it's simply due to unfixed bugs in the code", "Human IQ has capped AI development"],
+        a: 2,
+        eZ: "姚顺宇直言，很多所谓的Scaling Law撞墙，多数只是自己代码有Bug。修一个Bug带来的进展远大于神奇的技巧，预训练依然在变强。",
+        eE: "Yao stated that most 'Scaling Law walls' are just bugs in the code. Fixing a bug brings more progress than magical tricks; pre-training is still scaling."
+    },
+    {
+        qZ: "Sam Altman提到的“GPT-5”核心理念是什么？",
+        qE: "What is the core concept of 'GPT-5' mentioned by Sam Altman?",
+        oZ: ["它是一个拥有百万亿参数的单一预训练模型", "它是一个把推理、联网、语音、画布等功能统一打包的“System（系统）”", "它是一个纯粹的开源模型", "它是一个专门生成视频的工具"],
+        oE: ["A single pre-trained model with 100T parameters", "A unified 'System' packaging reasoning, web search, voice, canvas, etc.", "A purely open-source model", "A tool dedicated to video generation"],
+        a: 1,
+        eZ: "此GPT-5非彼GPT-5，Altman强调的是简化产品线，把一系列模型和功能（联网、语音、Deep Research等）打包成一个统一体验的System。",
+        eE: "Altman emphasizes simplifying the product line by packaging various models and tools (search, voice, reasoning) into a unified 'System' UX."
+    },
+    {
+        qZ: "相比其他模型，Claude 3.5/3.7 系列最突出的基因和强项是什么？",
+        qE: "Compared to other models, what is the most prominent DNA/strength of the Claude 3.5/3.7 series?",
+        oZ: ["作为Agentic程序员，进行智能编码和工具调用", "极高性价比的API推理成本", "最强的中文网文创意写作", "完全开源且无需算力卡限制"],
+        oE: ["Acting as an agentic programmer for smart coding and tool use", "Extremely cost-effective API inference", "The best Chinese creative writing", "Fully open-source with no compute limits"],
+        a: 0,
+        eZ: "Anthropic/Claude的基因是坚决在Coding上干翻对手，致力于成为最强的Agentic程序员，极度擅长代码重构和工具使用。",
+        eE: "Anthropic's DNA is focused heavily on coding, striving to build the ultimate agentic programmer that excels at code refactoring and tool usage."
+    },
+    {
+        qZ: "评估大模型任务难度时，所谓的“实习生测试”指的是什么？",
+        qE: "When evaluating task difficulty for LLMs, what does the 'Intern Test' refer to?",
+        oZ: ["让大模型去面试大厂的实习生岗位", "如果一个人类大学实习生无法根据提示词完成任务，那就不该指望AI能完成", "让实习生去写模型的底层代码", "测试模型是否能忍受无薪加班"],
+        oE: ["Having the LLM interview for intern jobs", "If a human intern can't complete the task with the given instructions, don't expect the AI to", "Having interns write the model's core code", "Testing if the model tolerates unpaid overtime"],
+        a: 1,
+        eZ: "把LLM当成大学实习生，如果人类实习生拿到你的提示词都做不好，那就说明任务需要简化或拆分，不该怪AI做不到。",
+        eE: "Treat the LLM like a college intern. If a human intern couldn't do the task with your prompt, you should simplify it instead of blaming the AI."
+    },
+    {
+        qZ: "RAG（检索增强生成）系统的最终输出质量，最严重依赖于什么？",
+        qE: "The final output quality of a RAG system most heavily depends on what?",
+        oZ: ["GPU的显存大小", "检索到的外部文档的信息密度和质量", "系统UI的美观程度", "用户的打字速度"],
+        oE: ["GPU VRAM size", "The information density and quality of the retrieved external documents", "The aesthetics of the UI", "The user's typing speed"],
+        a: 1,
+        eZ: "RAG的质量取决于检索文档的质量。相关性越高、信息密度越高的文档，能让模型输出越好的结果（Garbage in, garbage out）。",
+        eE: "RAG quality depends entirely on the retrieved docs. High relevance and information density lead to high-quality outputs."
+    },
+    {
+        qZ: "Gemini 2.0/3.0 与 Chrome浏览器深度整合后，带来的“Auto Browse”功能有什么革命性？",
+        qE: "What is revolutionary about the 'Auto Browse' feature born from the deep integration of Gemini and Chrome?",
+        oZ: ["自动拦截所有视频广告", "让Chrome变成智能体，能像人一样自动打开网页、点击按钮、填写表单来完成任务", "自动降低电脑CPU温度", "自动把所有网页翻译成拉丁文"],
+        oE: ["Blocks all video ads automatically", "Turns Chrome into an agent that clicks, opens pages, and fills forms like a human", "Automatically lowers CPU temperature", "Translates all pages to Latin automatically"],
+        a: 1,
+        eZ: "Auto Browse让Chrome变成了Gemini的“完全体容器”，AI长出了手脚，可以代人点击、浏览、执行网页自动化任务。",
+        eE: "Auto Browse turns Chrome into an agent vessel, giving AI 'hands' to click, navigate, and execute web tasks autonomously."
+    },
+    {
+        qZ: "关于中国大模型芯片采购的推演，为什么预测政策会允许头部厂商继续买H200，同时必须买国产芯片？",
+        qE: "Why is it predicted that Chinese policy will allow top LLM firms to buy H200s while mandating domestic chip purchases?",
+        oZ: ["因为国产芯片只适合打游戏", "为了让头部大厂用H200搞高难度训练不掉队，同时用庞大的推理(Inference)需求养活国产芯片产业链", "因为H200非常便宜", "为了将H200全部拆解研究"],
+        oE: ["Because domestic chips are only for gaming", "To keep top labs competitive in training with H200, while using massive inference demand to feed the domestic chip supply chain", "Because H200s are very cheap", "To dismantle all H200s for reverse engineering"],
+        a: 1,
+        eZ: "训练大模型急需顶配H200避免掉队，而对外提供推理服务（Inference）用国产芯片绰绰有余，这样既保住了AI战略，又养活了本土半导体。",
+        eE: "Training requires top-tier H200s to stay globally competitive, while domestic chips are sufficient for inference, thus sustaining the local semiconductor industry."
+    },
+    {
+        qZ: "在软件开发中，所谓“Vibe Coding”指的是什么工作模式？",
+        qE: "In software development, what does the working mode 'Vibe Coding' refer to?",
+        oZ: ["一边听电子音乐一边盲打代码", "人类专注于产品架构和交互，让AI自动处理语法和底层代码的编写", "完全不写代码，只靠意念控制电脑", "将所有代码外包给低成本国家的程序员"],
+        oE: ["Typing code blindly while listening to EDM", "Humans focus on product architecture/UI, letting AI handle syntax and boilerplate code", "Writing no code and controlling PC with thought", "Outsourcing all code to low-cost countries"],
+        a: 1,
+        eZ: "Vibe Coding指人类只需提供高层面的直觉、架构设计和需求（Vibe），繁琐的代码语法和修Bug交由AI IDE（如Cursor/Trae）自动完成。",
+        eE: "Vibe Coding means humans provide high-level intuition and architecture (the vibe), while AI IDEs handle the syntax and bug-fixing."
+    },
+    {
+        qZ: "Anthropic研究员是如何打开大模型“黑盒子”的？",
+        qE: "How did Anthropic researchers open the 'black box' of LLMs?",
+        oZ: ["用锤子砸开了服务器外壳", "识别出对应特定人类概念的“神经元集合（特征/Features）”并成功对其操控", "强制模型输出内部日记", "在代码中加入后门程序"],
+        oE: ["Smashed the server with a hammer", "Identified clusters of neurons ('Features') corresponding to human concepts and manipulated them", "Forced the model to output a diary", "Added backdoors to the code"],
+        a: 1,
+        eZ: "他们扫描了AI模型的“大脑”，提取出数百万个映射到特定概念（如偏见、特定名词）的“神经元特征”，从而理解并操控其行为。",
+        eE: "They scanned the AI's 'brain' and mapped clusters of neurons to specific human concepts ('features'), allowing them to understand and manipulate behavior."
+    },
+    {
+        qZ: "被广泛使用的AI编程工具Claude Code是如何在Anthropic内部诞生的？",
+        qE: "How was the widely used AI coding tool 'Claude Code' born inside Anthropic?",
+        oZ: ["CEO自上而下强制指派的核心任务", "一个为了提效的底层研究员个人发起的自下而上（Bottom-up）的项目", "从竞争对手那里窃取的源代码", "外包给大学实验室的副产品"],
+        oE: ["A top-down mandate from the CEO", "A bottom-up individual project started by a researcher to improve efficiency", "Source code stolen from a competitor", "A byproduct outsourced to a university lab"],
+        a: 1,
+        eZ: "姚顺宇提到，Claude Code是“个人英雄主义的开端”，完全是一个底层研究员为了提效自己做出来的，后来成了最重要产品。",
+        eE: "Yao mentioned Claude Code was a 'bottom-up' project born from a single researcher wanting an efficiency tool, making it a triumph of individual heroism."
+    },
+    {
+        qZ: "相比于ChatGPT和Claude，Grok大模型最具差异化的护城河是什么？",
+        qE: "Compared to ChatGPT and Claude, what is the most highly differentiated moat for the Grok model?",
+        oZ: ["可以免费生成高质量视频", "极其严苛的内容审查机制", "直接调用X（推特）上的实时帖子作为最新信息源", "代码能力世界第一"],
+        oE: ["Generates high-quality video for free", "Extremely strict content censorship", "Directly accesses real-time posts on X (Twitter) as an info source", "World's best coding ability"],
+        a: 2,
+        eZ: "Grok的护城河在于实时数据和新闻，它能无缝接入X平台的实时讨论，这种信息源的差异化是别家很难复制的。",
+        eE: "Grok's moat is real-time data and news, as it seamlessly integrates live posts from X (Twitter), an info source hard for competitors to replicate."
+    },
+    {
+        qZ: "AI Agent智能体的“iPhone时刻”比作电脑发展的什么阶段？",
+        qE: "What stage of computer development is the 'iPhone moment' of AI Agents compared to?",
+        oZ: ["从品牌整机倒退回硬核极客DIY组装", "将复杂的API、Token计算等底层配置彻底隐藏，让普通人无感化使用", "全面舍弃图形界面，退回命令行", "强制所有用户学习二进制编程"],
+        oE: ["Regressing from pre-built PCs to hardcore DIY assembly", "Completely hiding complex API and token configs so normal people use it seamlessly", "Abandoning GUI for command line", "Forcing all users to learn binary coding"],
+        a: 1,
+        eZ: "早期的AI像“组装机”一样繁琐，真正的iPhone时刻是把所有复杂度吃掉、封装好，让普通用户能直接使用服务。",
+        eE: "Early AI is like 'DIY PCs'. The true iPhone moment happens when all the API and token complexity is hidden behind a seamless user experience."
+    },
+    {
+        qZ: "为什么说“AI是放大器，不是救世主”？",
+        qE: "Why is it said that 'AI is an amplifier, not a savior'?",
+        oZ: ["因为AI只能放大音量", "因为如果人类自身逻辑混沌，再好的AI也只能还你一堆漂亮的废话", "因为AI最终会毁灭世界", "因为AI只能用来做计算器"],
+        oE: ["Because AI only amplifies audio", "Because if human logic is chaotic, even the best AI just returns beautiful nonsense", "Because AI will destroy the world", "Because AI is only good as a calculator"],
+        a: 1,
+        eZ: "AI遵循'Stronger gets stronger'的逻辑，它放大了人类的认知。没有核心认知的人，有了AI依然做不出好决策。",
+        eE: "AI follows the 'Stronger gets stronger' logic. It amplifies existing clarity; if your thinking is chaotic, AI just produces beautiful nonsense."
+    },
+    {
+        qZ: "OpenAI发布的Deep Research（深度研究）与传统AI搜索（如ChatGPT Search）最大的区别是什么？",
+        qE: "What is the biggest difference between OpenAI's Deep Research and traditional AI Search?",
+        oZ: ["它不消耗任何电量", "Deep Research是Agent智能体，能花费几十分钟深入阅读、规划、提炼并输出几十页带精确引用的长篇报告", "Deep Research只能搜索英文内容", "Deep Research不依赖网络连接"],
+        oE: ["It uses zero electricity", "Deep Research is an agent that spends minutes/hours deeply reading, planning, and synthesizing long reports with exact citations", "It only searches English content", "It works offline"],
+        a: 1,
+        eZ: "Search只是快速搜索和整合（几秒钟），而Deep Research是一个研究Agent，会花长达几十分钟自动翻阅多语言网页、交叉验证并写出深度报告。",
+        eE: "Search is fast and shallow. Deep Research acts as an agent, spending up to an hour reading multi-lingual pages and synthesizing deeply cited reports."
+    },
+    {
+        qZ: "DeepSeek内部闭门会认为，中国AI与美国顶尖水平的真实差距大约是多少？",
+        qE: "According to the DeepSeek closed-door meeting, what is the estimated true gap between Chinese AI and top US levels?",
+        oZ: ["领先美国5年", "落后美国2年以上", "大约只有3-9个月，甚至某些方面更强", "完全没有可比性"],
+        oE: ["Leading the US by 5 years", "Lagging by more than 2 years", "Only about 3-9 months, and stronger in some areas", "Completely incomparable"],
+        a: 2,
+        eZ: "以前外界认为落后两年，但DeepSeek的突破表明差距其实在3-9个月，特别是在推理模型架构上追赶得极快。",
+        eE: "Previously thought to be 2 years behind, DeepSeek proved the gap is actually 3-9 months, especially because reasoning architectures are easier to replicate."
+    },
+    {
+        qZ: "单纯依赖“蒸馏（Distillation）”技术去训练大模型，长期来看最大的风险是什么？",
+        qE: "What is the biggest long-term risk of relying purely on 'Distillation' techniques to train LLMs?",
+        oZ: ["蒸馏会导致硬件寿命缩短", "多样性下降，模型上限被“老师”锁死，永远无法超越被蒸馏的顶尖模型", "蒸馏出来的模型体积会变得极其庞大", "完全不合法"],
+        oE: ["Distillation shortens hardware lifespan", "Diversity drops and the ceiling is capped by the 'teacher', making it impossible to surpass top models", "Distilled models become massively bloated in size", "It is completely illegal"],
+        a: 1,
+        eZ: "蒸馏（大教小）能快速提升性能，但坏处是模型diversity下降，上限受限于Teacher模型，无法引领下一代前沿突破。",
+        eE: "Distillation rapidly improves performance but reduces diversity and caps the model's ceiling to the teacher's, preventing true frontier breakthroughs."
+    },
+    {
+        qZ: "建议深夜睡不着时给AI发送的“人生破局Prompt”，其核心逻辑是什么？",
+        qE: "What is the core logic behind the recommended 'Late Night Prompt' for life breakthroughs?",
+        oZ: ["让AI讲个笑话哄你睡觉", "把财务、教育、家庭等全盘信息托出（给足Context），让大模型做多维度的短期/长期人生推演", "让AI帮你写一封辞职信", "让AI计算明天股票的涨跌"],
+        oE: ["Asking AI to tell a joke to put you to sleep", "Providing total context (finances, education, family) so the LLM can generate multi-dimensional short/long term life strategies", "Having AI write a resignation letter", "Having AI calculate tomorrow's stock prices"],
+        a: 1,
+        eZ: "大模型需要极高质量的上下文（Context）。当你把人生现状毫无保留地喂给它，其强大的逻辑推理能帮你理清盲点，给出客观规划。",
+        eE: "LLMs require high-quality context. By revealing your entire life situation, its strong reasoning can clear up blind spots and offer objective planning."
+    },
+    {
+        qZ: "蔡崇信（Joe Tsai）如何向外行人比喻大语言模型（LLM）的“预训练”和“垂直应用”？",
+        qE: "How did Joe Tsai use a human analogy to explain 'pre-training' vs 'vertical applications' of LLMs to laymen?",
+        oZ: ["预训练是学走路，应用是跑马拉松", "预训练模型就像让孩子拿到了博士学位，而在垂直应用中则是让这个博士去干一份具体的工作", "预训练是买菜，应用是做饭", "预训练是造汽车，应用是加油"],
+        oE: ["Pre-training is walking, application is running a marathon", "A pre-trained model is like a child getting a PhD, while vertical applications are like putting that PhD to a specific job", "Pre-training is buying groceries, application is cooking", "Pre-training is building a car, application is pumping gas"],
+        a: 1,
+        eZ: "蔡崇信把大模型比作受过高等教育拿到多个博士学位的人类，而实际的商业变现则是把这个“博士”安排到具体的电商或客服岗位上。",
+        eE: "Tsai compared a base model to a human with multiple PhDs, and vertical applications to assigning that highly educated person to a specific job."
+    },
+    {
+        qZ: "在提示词工程中，调节“Temperature（温度）”参数的作用是什么？",
+        qE: "In prompt engineering, what is the role of adjusting the 'Temperature' parameter?",
+        oZ: ["控制机房GPU的散热", "调节模型输出的创造性/多样性（高）与确定性/精准度（低）", "改变模型输出界面的背景颜色", "控制模型运行速度的快慢"],
+        oE: ["Controlling GPU cooling in the server room", "Adjusting the creativity/diversity (high) versus determinism/accuracy (low) of the model's output", "Changing the background color of the UI", "Controlling how fast the model runs"],
+        a: 1,
+        eZ: "高温度让输出更多样、更有创意（适合文学），低温度让输出更稳定、确定（适合写代码和逻辑推理）。",
+        eE: "High temperature increases creativity and diversity, while low temperature makes outputs highly deterministic and stable."
+    },
+    {
+        qZ: "在评估大模型性能时，为什么说“过分强调某些评估指标可能损害整体性能”？",
+        qE: "When evaluating LLMs, why is it said that 'over-emphasizing certain metrics can harm overall performance'?",
+        oZ: ["因为评估需要花太多钱", "因为“当一个衡量标准变成目标时，它就不再是一个好的衡量标准”（古德哈特定律）", "因为指标越高模型越容易崩溃", "因为开源模型没有指标评测"],
+        oE: ["Because evaluation costs too much money", "Because 'when a measure becomes a target, it ceases to be a good measure' (Goodhart's Law)", "Because higher metrics crash the model", "Because open-source models lack metrics"],
+        a: 1,
+        eZ: "一旦为了刷榜而过度优化特定的Benchmark指标（如强行记题库），模型就会在真实应用场景中失去泛化能力。",
+        eE: "If models are over-optimized just to top a benchmark (e.g., memorizing test sets), they lose their generalization abilities in real-world tasks."
+    },
+    {
+        qZ: "在高考数学测试中，为什么顶尖AI大模型在“看图题（如坐标系问题）”上几乎全军覆没？",
+        qE: "In the Gaokao math test, why did top AI models almost completely fail the 'image-based questions' (e.g., coordinate graphs)?",
+        oZ: ["因为它们鄙视几何学", "目前AI的多模态视觉能力还无法极度精确地识别图表中的角度、坐标数值等细微空间对应关系", "因为图片文件太大加载失败", "因为题目涉及政治机密"],
+        oE: ["Because they despise geometry", "Current multimodal vision capabilities cannot yet perfectly extract precise spatial coordinates, angles, and minute details from pixels", "Because image files were too large to load", "Because the questions involved political secrets"],
+        a: 1,
+        eZ: "文本逻辑虽然满分，但现阶段视觉多模态在提取带有精准数学空间信息的像素（坐标、箭头方向）时存在局限，输入信息残缺导致做错。",
+        eE: "While text logic is near perfect, current multimodal vision struggles to extract highly precise spatial and coordinate data from pixels, leading to flawed inputs."
+    },
+    {
+        qZ: "为了防止Gemini在翻译视频对话时“偷懒写摘要”，用户使用了什么巧妙的Prompt技巧？",
+        qE: "To prevent Gemini from 'lazily summarizing' when translating video dialogue, what clever prompt trick did a user employ?",
+        oZ: ["用全大写字母骂它", "要求它“生成一个包含排版的HTML网页报告”", "要求它把所有文字翻译三次", "给它承诺100美元的小费"],
+        oE: ["Scolding it in all caps", "Asking it to 'generate an HTML webpage report with styling'", "Asking it to translate everything three times", "Promising a $100 tip"],
+        a: 1,
+        eZ: "如果直接让它翻译，模型容易偷懒总结。但如果让它写HTML代码排版，触发了它的“程序员模式”，它就会老老实实逐字逐句干活。",
+        eE: "Asking it to output styled HTML triggers its 'coding mode', making it meticulously process every word instead of lazily summarizing the text."
+    },
+    {
+        qZ: "ChatGPT中隐藏的“QuizGPT”咒语能实现什么神级功能？",
+        qE: "What god-tier function does the hidden 'QuizGPT' spell in ChatGPT unlock?",
+        oZ: ["让它代替你参加考试", "自动帮你破解付费题库", "根据你们的对话或任何知识，生成难度递进的互动闪卡(Flashcards)来提问你", "一键生成调查问卷发给微信好友"],
+        oE: ["Taking exams for you", "Hacking paid question banks", "Generating dynamically scaling interactive flashcards to quiz you based on any knowledge or your chat history", "Creating surveys to send to WeChat friends"],
+        a: 2,
+        eZ: "输入“quiz me with QuizGPT”，大模型会变成一个互动考官，根据讨论的知识点生成难度逐渐增加的闪卡，极大地提升学习效率。",
+        eE: "Using this prompt turns the LLM into an interactive examiner, generating spaced-repetition flashcards scaling in difficulty based on the context."
+    },
+    {
+        qZ: "谷歌NotebookLM被誉为“学习神器”，它最核心的优势是什么？",
+        qE: "Hailed as a 'learning artifact', what is the core advantage of Google's NotebookLM?",
+        oZ: ["它内置了全网所有的大学课本", "它不仅严格基于你上传的资料防止幻觉，还能将高密度信息“预消化”（例如生成两人的深度播客对话）", "它能自动替你写论文并发表", "它完全不需要连接网络即可使用"],
+        oE: ["It contains all university textbooks on the web", "It strictly grounds answers in uploaded docs to prevent hallucination, and 'pre-digests' dense info (e.g., generating dual-host podcasts)", "It auto-writes and publishes papers for you", "It works completely offline"],
+        a: 1,
+        eZ: "NotebookLM是高密度信息的“预消化”引擎，并且严格基于用户上传的源文件回答问题（Grounding），还独创了生成逼真双人播客的功能。",
+        eE: "It grounds its answers strictly in user uploads to avoid hallucinations, acting as an engine that pre-digests dense info into accessible formats like podcasts."
+    },
+    {
+        qZ: "DeepSeek V3 能够把预训练成本压低到仅500多万美元，主要依赖于哪两项架构创新？",
+        qE: "DeepSeek V3 managed to slash its pre-training cost to just over $5 million primarily due to which two architectural innovations?",
+        oZ: ["全量参数激活与CNN网络", "Multi-head Latent Attention (MLA) 与 Mixture-of-Experts (MoE)", "使用机械硬盘存储与外包数据标注", "彻底放弃多语言训练与量子计算"],
+        oE: ["Dense activation and CNNs", "Multi-head Latent Attention (MLA) and Mixture-of-Experts (MoE)", "Using HDD storage and outsourcing data labeling", "Abandoning multi-lingual training and using quantum computing"],
+        a: 1,
+        eZ: "DeepSeek V3采用了MLA和DeepSeekMoE架构，使得拥有671B参数的庞然大物在推理时只需激活370亿参数，大幅省钱。",
+        eE: "V3 used MLA and MoE architectures, allowing a massive 671B parameter model to activate only 37B parameters per token, drastically cutting costs."
+    },
+    {
+        qZ: "有大V提出用Obsidian加上Trae（内含Claude Code）构建“第二大脑”，这与传统笔记软件有何本质区别？",
+        qE: "Influencers suggest using Obsidian with Trae (running Claude Code) as a 'Second Brain'. How does this fundamentally differ from traditional note apps?",
+        oZ: ["这只是换了一个更酷的软件皮肤", "传统笔记是静态存储，而此方案让AI拥有本地仓库的全局读写权限，能主动分析日记、打标签、自我纠错并重构知识", "这种方案完全保密，因为没有任何文件生成", "这种方案需要手写SQL查询笔记"],
+        oE: ["It's just a cooler skin for notes", "Traditional notes are static storage; this setup gives an AI agent full read/write access to autonomously analyze, tag, and restructure knowledge", "It's fully secret because no files are generated", "It requires writing SQL to query notes"],
+        a: 1,
+        eZ: "给Claude Code授予本地笔记Vault的读写权限，相当于给静态信息库配了一个超强算力的“全职管家”，能自动化完成知识分析和重构。",
+        eE: "Giving Claude Code read/write access to a local note vault turns static storage into an active intelligence that can autonomously analyze, tag, and restructure knowledge."
+    },
+    {
+        qZ: "Gemini的“连接Google Doc”功能，解决了AI写作助手的什么痛点？",
+        qE: "What pain point for AI writing assistants does Gemini's 'Connect Google Doc' feature solve?",
+        oZ: ["解决了文档无法导出为PDF的问题", "解决了每次都要重写复杂系统提示词的痛点；你只需更新文档，AI就会自动读取最新规则“变成熟”", "解决了无法给文章配图的缺陷", "解决了AI无法识别方言的痛点"],
+        oE: ["It solves the inability to export PDFs", "It solves rewriting complex system prompts; you simply update the doc, and the AI dynamically learns the new rules to 'mature'", "It solves the inability to add images", "It solves AI's inability to recognize dialects"],
+        a: 1,
+        eZ: "只需将写作规范（风格、禁用词）放在文档里，随时更新，Gemini会自动读取最新版本，实现“可成长的AI”，免去繁琐调教。",
+        eE: "By putting writing rules in a doc, any updates are dynamically read by Gemini. Your AI 'matures' without the need to rewrite complex system prompts every time."
+    },
+    {
+        qZ: "OpenAI CTO 认为，AI的“智能（Intelligence）”和“安全（Safety）”是互斥的还是相辅相成的？",
+        qE: "Does the OpenAI CTO believe AI 'Intelligence' and 'Safety' are mutually exclusive or complementary?",
+        oZ: ["互斥的，越聪明的AI越容易毁灭人类", "相辅相成的，因为引导一个聪明的系统（让它懂安全护栏）比训练一个笨系统容易得多", "毫无关系，是两个完全独立的部门在管", "互斥的，为了安全只能限制算力"],
+        oE: ["Mutually exclusive; smarter AI is more likely to destroy humanity", "Complementary; steering a smart system (teaching it safety guardrails) is much easier than training a dumb one", "Unrelated; handled by completely separate departments", "Mutually exclusive; safety requires limiting compute"],
+        a: 1,
+        eZ: "Mira指出，就像训练聪明的狗比笨狗容易一样，更聪明的AI模型能更深刻地理解什么是危险行为和安全护栏。",
+        eE: "Mira pointed out that, just like training a smart dog is easier than a dumb one, a more intelligent AI inherently understands safety guardrails much better."
+    },
+    {
+        qZ: "在未来高等教育中，AI最大的革命性用途预计是什么？",
+        qE: "What is expected to be the most revolutionary use of AI in the future of higher education?",
+        oZ: ["完全取代大学教授进行课堂大班授课", "为全世界任何人提供高质量的、定制化的一对一（1-on-1）私教辅导，并教会人类“如何学习”", "代替学生写出查重率为0的毕业论文", "全自动批改考卷并直接发放文凭"],
+        oE: ["Completely replacing professors in large lecture halls", "Providing high-quality, customized 1-on-1 tutoring to anyone worldwide, and teaching humans 'how to learn'", "Writing zero-plagiarism graduation theses for students", "Fully automating exam grading and issuing diplomas"],
+        a: 1,
+        eZ: "AI能打破教育资源壁垒，提供因材施教的1对1辅导，并从根本上帮助学生掌握“如何学习”，而非仅仅传递知识。",
+        eE: "AI can break educational barriers by providing personalized 1-on-1 tutoring and fundamentally helping students master 'how to learn' rather than just passing facts."
+    },
+    {
+        qZ: "为什么说“别神化AI，知道能力边界最重要”？",
+        qE: "Why is it advised to 'not deify AI, and know its capability boundaries'?",
+        oZ: ["因为AI是由外星科技驱动的，随时会离开地球", "因为AI本质是微积分优化和数据概率匹配，没有真正跳跃的联想能力，且无法推断私有/未联网数据", "因为AI只能在白天工作", "因为AI实际上是由印度外包人员假扮的"],
+        oE: ["Because AI is alien tech and might leave Earth anytime", "Because AI is essentially calculus optimization and probabilistic data matching; it lacks true leaping association and cannot infer private/unseen data", "Because AI only works during the day", "Because AI is actually Indians in a call center"],
+        a: 1,
+        eZ: "AI是基于大量公有数据进行的微积分推导，它不能像人类一样直接产生跳跃性顿悟，也无法解决缺乏干净数据的私有底层硬核问题。",
+        eE: "AI relies on calculus optimization over public data. It lacks human-like leaping intuition and cannot solve domain-specific problems lacking clean training data."
+    },
+    {
+        qZ: "中国早期国企、机关采购“大模型一体机”在产业发展中起到了什么关键作用？",
+        qE: "What key role did early SOE and government purchases of 'AI Appliance Machines' play in China's industrial development?",
+        oZ: ["导致了AI人才大量流失到体制内", "解决了100%本地部署的隐私和合规问题，同时为初创的大模型公司送去了第一笔救命营收，助其继续融资囤卡", "让国企员工全都失业了", "直接引爆了AI在短视频平台上的传播"],
+        oE: ["Caused a massive brain drain of AI talent into the public sector", "Solved 100% local deployment privacy/compliance issues, while providing critical initial revenue to AI startups so they could survive and buy GPUs", "Caused all SOE employees to lose their jobs", "Directly triggered AI virality on short-video platforms"],
+        a: 1,
+        eZ: "政府和国企对本地一体机的采购，不仅在政治上安全可靠，更重要的是给“大模型六小虎”输送了真金白银的订单，让它们活了下来去拼算力。",
+        eE: "SOE purchases of local secure AI boxes provided vital initial cash flow to Chinese AI startups, allowing them to survive, buy GPUs, and stay in the global race."
+    },
+    {
+        qZ: "根据日常高频使用体验，Grok模型、Claude和Gemini的“人设”分别更像什么？",
+        qE: "Based on frequent user experience, what 'personas' do Grok, Claude, and Gemini resemble most?",
+        oZ: ["Grok=实时记者，Claude=工程师/架构师，Gemini=全知科学家", "Grok=艺术家，Claude=小学生，Gemini=数学家", "Grok=游戏玩家，Claude=厨师，Gemini=政客", "Grok=翻译家，Claude=记者，Gemini=会计"],
+        oE: ["Grok = Real-time Reporter, Claude = Engineer/Architect, Gemini = Omniscient Scientist", "Grok = Artist, Claude = Grade-schooler, Gemini = Mathematician", "Grok = Gamer, Claude = Chef, Gemini = Politician", "Grok = Translator, Claude = Reporter, Gemini = Accountant"],
+        a: 0,
+        eZ: "Grok擅长X平台实时新闻抓取，Claude在代码和架构设计上无与伦比，Gemini则因其多模态和长文本更像一个爱展示的科学家。",
+        eE: "Grok excels at real-time X news, Claude is unmatched in coding and architecture, and Gemini's long-context multimodal traits make it act like a showy scientist."
+    },
+    {
+        qZ: "在提示词工程（Prompt Engineering）中，为什么推荐“优先采用确定性工作流”？",
+        qE: "In Prompt Engineering, why is it recommended to 'prioritize deterministic workflows'?",
+        oZ: ["因为确定性工作流消耗的电费更少", "将庞大复杂的提示词分解为多个短小、明确的步骤，可以大幅降低幻觉，让结果更容易管理和控制", "因为大模型讨厌长句子", "为了让生成速度变慢以显得更专业"],
+        oE: ["Because deterministic workflows use less electricity", "Breaking down massive prompts into short, explicit steps drastically reduces hallucinations and makes results easier to manage and control", "Because LLMs hate long sentences", "To slow down generation and make it look professional"],
+        a: 1,
+        eZ: "与其写一个超长且容易让AI混乱的Prompt，不如把它拆分成流水线上的多个小任务，结果更稳定可靠。",
+        eE: "Rather than one huge, confusing prompt, breaking a task into a multi-step deterministic pipeline makes the AI's output stable, reliable, and easy to control."
+    },
+    {
+        qZ: "即便AI前端生成能力极强，为什么目前还无法实现“完全不看代码的纯Vibe Coding”？",
+        qE: "Even with incredibly strong AI frontend capabilities, why is 'pure Vibe Coding without ever looking at code' not yet possible?",
+        oZ: ["因为AI生成的界面颜色太丑", "当遇到复杂的应用状态管理（如React生命周期）出现深度Bug时，依然需要人类架构师介入“救火”厘清逻辑", "因为GitHub禁止AI访问", "因为各大浏览器联合抵制AI代码"],
+        oE: ["Because AI-generated interface colors are ugly", "When complex state management (e.g., React lifecycles) produces deep bugs, human architects are still needed to intervene and clarify the logic", "Because GitHub banned AI access", "Because browsers boycott AI code"],
+        a: 1,
+        eZ: "对于单页面和小工具AI胜任，但在构建复杂联机游戏或大型系统状态管理时，AI容易陷入死循环，仍需人类排查深层逻辑。",
+        eE: "While AI is great for small tools, complex tasks like multiplayer state management often confuse AI, requiring human architects to debug the deep logical loops."
+    },
+    {
+        qZ: "预测未来AI对就业市场的影响，最先被大规模取代的往往是哪类工作？",
+        qE: "Predicting AI's impact on the job market, what type of work is most likely to be replaced on a large scale first?",
+        oZ: ["需要极强同理心的心理咨询师", "大量纯重复性的、且从业者没有进一步发展的流水线白领工作（如基础QA、初级外包代码、机械数据搬运）", "修理硬件设备的下水道工和电工", "进行顶尖科研攻关的物理学家"],
+        oE: ["Psychotherapists requiring extreme empathy", "Massive amounts of purely repetitive white-collar tasks where workers have no further development (e.g., basic QA, junior code outsourcing, mechanical data entry)", "Plumbers and electricians fixing hardware", "Physicists leading top-tier research"],
+        a: 1,
+        eZ: "如果工作仅仅是机械化地搬运信息、测试代码且缺乏创造与全局架构能力，这类极易被标准化的工作是最先被AI淘汰的。",
+        eE: "Jobs that are easily standardized and purely repetitive without strategic development—like basic QA or data shuffling—are the prime targets for AI replacement."
+    },
+    {
+        qZ: "当前AI应用时代，用户的“忠诚度”有什么显著特征？",
+        qE: "What is a prominent characteristic of user 'loyalty' in the current AI application era?",
+        oZ: ["极度忠诚于某一家巨头", "忠诚度几乎为零，一旦有工具（如从ChatGPT到Claude再到Cursor）能提供更强的效用，用户会瞬间倒戈", "因为怕麻烦，很少更换工具", "只对开源且免费的工具忠诚"],
+        oE: ["Extremely loyal to a single tech giant", "Loyalty is virtually zero; the moment a tool (e.g., jumping from ChatGPT to Claude to Cursor) provides better utility, users defect instantly", "Rarely change tools out of laziness", "Only loyal to open-source free tools"],
+        a: 1,
+        eZ: "AI时代的技术壁垒极易被打破，今天GPT牛，明天Claude代码强，后天DeepSeek性价比高。用户用脚投票，谁强用谁。",
+        eE: "Tech moats are shattered quickly in the AI era. Users ruthlessly chase utility, switching from GPT to Claude to DeepSeek the moment one performs better."
+    },
+    {
+        qZ: "为什么经验丰富的用户不建议使用 o1-pro 或 o3-mini 来生成创意长文或小说？",
+        qE: "Why do experienced users advise against using o1-pro or o3-mini to generate creative long-form articles or novels?",
+        oZ: ["因为这涉嫌侵犯著作权", "这些推理模型是高度结构化的“理科脑子（STEM）”，擅长死磕逻辑，但不擅长文科的情感表达和修辞润色", "因为它们生成中文时经常出现乱码", "因为它们拒绝回答非数学问题"],
+        oE: ["Because it infringes on copyright", "These reasoning models possess highly structured 'STEM brains', excelling at hard logic but lacking the emotional nuance and rhetorical polish of humanities", "Because they often output gibberish in Chinese", "Because they refuse to answer non-math questions"],
+        a: 1,
+        eZ: "Pro/Thinking系列模型为了解数理逻辑题进行了深度微调（RL），代价是丧失了文学创作的松弛感和创意性，输出往往像干瘪的报告。",
+        eE: "Pro/Thinking models are deeply fine-tuned via RL for mathematical logic. The trade-off is they lack creative flow, outputting rigid, report-like text."
+    },
+    {
+        qZ: "“AI 提升的是下限，而非上限”这句话的深层含义是什么？",
+        qE: "What is the deeper meaning behind the phrase 'AI raises the floor, not the ceiling'?",
+        oZ: ["AI只能做低端工作，永远做不了高级分析", "AI能让普通人瞬间达到及格线以上的专业水准，但真正的顶尖创意、洞察力和“破局”仍需依赖人类高手的认知", "AI会拉低整个人类的智商", "大模型在达到某参数量后就无法再进步了"],
+        oE: ["AI can only do low-end jobs and never high-level analysis", "AI allows laymen to instantly reach a highly competent baseline, but true top-tier creativity, insight, and breakthroughs still rely on human experts' cognition", "AI will drag down the overall IQ of humanity", "Models cannot improve after reaching a certain parameter count"],
+        a: 1,
+        eZ: "AI是个绝佳的杠杆，让“没背景技能的人”变得有用。但要拔尖，依然取决于人类使用者的品味、见识和第一性原理思考能力。",
+        eE: "AI is the ultimate equalizer, giving novices expert-level baselines. But reaching the absolute top still requires the distinct taste, insight, and strategic thinking of human masters."
+    }
+];
+
+let userAnswers = {};
+let errorLog = [];
+
+function initQuiz() {
+    const container = document.getElementById('quiz-container');
+    let html = '';
+    
+    qData.forEach((q, i) => {
+        html += `
+        <div class="question-card" id="q-${i}">
+            <div class="question-title">
+                ${i + 1}. ${q.qZ}
+                <span class="bilingual">${q.qE}</span>
+            </div>
+            <div class="options">`;
+        
+        q.oZ.forEach((optZ, j) => {
+            html += `
+                <div class="option" id="opt-${i}-${j}" onclick="selectOption(${i}, ${j})">
+                    ${optZ}
+                    <span class="bilingual">${q.oE[j]}</span>
+                </div>`;
+        });
+        
+        html += `
+            </div>
+            <div class="feedback" id="fb-${i}">
+                <div class="correct-answer-text">
+                    ✓ 正确答案 / Correct Answer: ${q.oZ[q.a]} <br>
+                    <span style="color:#6c757d; font-weight:normal;">${q.oE[q.a]}</span>
+                </div>
+                <div style="margin-top:10px;">
+                    <strong>解析 / Explanation:</strong><br>
+                    ${q.eZ}<br>
+                    <span class="bilingual" style="margin-top:2px;">${q.eE}</span>
+                </div>
+            </div>
+        </div>`;
+    });
+    
+    container.innerHTML = html;
+}
+
+function selectOption(qIdx, optIdx) {
+    userAnswers[qIdx] = optIdx;
+    
+    // UI Update
+    for (let j = 0; j < 4; j++) {
+        const optEl = document.getElementById(`opt-${qIdx}-${j}`);
+        optEl.classList.remove('selected', 'correct', 'incorrect');
+    }
+    const clickedOpt = document.getElementById(`opt-${qIdx}-${optIdx}`);
+    clickedOpt.classList.add('selected');
+    clickedOpt.classList.add(optIdx === qData[qIdx].a ? 'correct' : 'incorrect');
+    
+    // Show Feedback Instantly
+    document.getElementById(`fb-${qIdx}`).style.display = 'block';
+    
+    // Hide Results if showing
+    const resultArea = document.getElementById('result-area');
+    if (resultArea.style.display === 'block') {
+        resultArea.style.display = 'none';
+        document.getElementById('btn-export').style.display = 'none';
+    }
+}
+
+function submitQuiz() {
+    let score = 0;
+    errorLog = [];
+    let errorHtml = '<div class="error-list"><h3 style="color:var(--red);">错题列表 / Review Errors</h3>';
+
+    qData.forEach((q, i) => {
+        const uAns = userAnswers[i];
+        if (uAns === q.a) {
+            score++;
+        } else {
+            const uAnsZh = uAns !== undefined ? q.oZ[uAns] : "未作答";
+            const uAnsEn = uAns !== undefined ? q.oE[uAns] : "Unanswered";
+            
+            errorLog.push({ q: q, uAnsZh: uAnsZh, uAnsEn: uAnsEn });
+            
+            errorHtml += `
+            <div class="error-item">
+                <div style="font-weight:600; margin-bottom:8px;">${i + 1}. ${q.qZ}<br><span class="bilingual">${q.qE}</span></div>
+                <div style="color:var(--red); margin-bottom:4px;">❌ 你的答案 / Your Answer: ${uAnsZh} <br><span class="bilingual">${uAnsEn}</span></div>
+                <div style="color:var(--green); margin-bottom:8px;">✓ 正确答案 / Correct: ${q.oZ[q.a]} <br><span class="bilingual">${q.oE[q.a]}</span></div>
+                <div><strong>解析 / Exp:</strong> ${q.eZ} <br><span class="bilingual">${q.eE}</span></div>
+            </div>`;
+        }
+    });
+    errorHtml += '</div>';
+
+    const percentage = ((score / qData.length) * 100).toFixed(1);
+    const resultArea = document.getElementById('result-area');
+    
+    let summaryHtml = `<h2 style="color:var(--primary); text-align:center;">得分 / Score: ${score} / ${qData.length} (${percentage}%)</h2>`;
+    
+    if (score < qData.length) {
+        summaryHtml += errorHtml;
+        document.getElementById('btn-export').style.display = 'inline-block';
+    } else {
+        summaryHtml += `<p style="text-align:center; color:var(--green); font-size:1.2em; font-weight:bold;">🎉 满分全对！ / Perfect Score!</p>`;
+        document.getElementById('btn-export').style.display = 'none';
+    }
+    
+    resultArea.innerHTML = summaryHtml;
+    resultArea.style.display = 'block';
+    
+    // Scroll to results
+    window.scrollTo({ top: resultArea.offsetTop - 20, behavior: 'smooth' });
+}
+
+function resetQuiz() {
+    if(!confirm('确定要清空所有答案吗？/ Are you sure you want to reset all answers?')) return;
+    
+    userAnswers = {};
+    document.getElementById('result-area').style.display = 'none';
+    document.getElementById('btn-export').style.display = 'none';
+    
+    qData.forEach((q, i) => {
+        for (let j = 0; j < 4; j++) {
+            document.getElementById(`opt-${i}-${j}`).classList.remove('selected');
+        }
+        document.getElementById(`fb-${i}`).style.display = 'none';
+    });
+    
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function exportErrors() {
+    if (errorLog.length === 0) return;
+    
+    const now = new Date();
+    let content = `AI时代核心知识测试错题本 / AI Quiz Error Log\n`;
+    content += `时间 / Time: ${now.toLocaleString()}\n`;
+    content += `错题数量 / Total Errors: ${errorLog.length}\n`;
+    content += `=================================================\n\n`;
+
+    errorLog.forEach((err, idx) => {
+        content += `[错题 ${idx + 1} / Error ${idx + 1}]\n`;
+        content += `题目 / Q: ${err.q.qZ}\n`;
+        content += `          ${err.q.qE}\n\n`;
+        content += `你的答案 / Your Ans : ${err.uAnsZh}\n`;
+        content += `                      ${err.uAnsEn}\n`;
+        content += `正确答案 / Correct  : ${err.q.oZ[err.q.a]}\n`;
+        content += `                      ${err.q.oE[err.q.a]}\n\n`;
+        content += `解析 / Explanation  : ${err.q.eZ}\n`;
+        content += `                      ${err.q.eE}\n`;
+        content += `-------------------------------------------------\n\n`;
+    });
+
+    const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `AI_Quiz_Errors_${now.getTime()}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+// Initialize on load
+window.onload = initQuiz;
+</script>
+
+</body>
+</html>

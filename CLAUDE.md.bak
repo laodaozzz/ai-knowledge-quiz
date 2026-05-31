@@ -1,0 +1,32 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project Overview
+
+A single-file bilingual (Chinese/English) interactive quiz webpage — "AI时代核心知识综合测试 / Comprehensive Core Knowledge Quiz in the AI Era". Contains 43 questions testing knowledge about LLMs, AI companies, AI concepts, and industry trends.
+
+## File Structure
+
+- `ytb.html` — The entire application: HTML structure, CSS styling, quiz data (`qData` array), and JavaScript logic (selection, scoring, reset, TXT export of wrong answers).
+
+## How to use
+
+Open `ytb.html` in any browser. No build step, no dependencies, no server required.
+
+## Quiz Data Format
+
+Each question object in `qData`:
+```js
+{
+    qZ: "Chinese question text",
+    qE: "English question text",
+    oZ: ["4 Chinese options"],
+    oE: ["4 English options"],
+    a: 0,          // index of correct answer (0-based)
+    eZ: "Chinese explanation",
+    eE: "English explanation"
+}
+```
+
+When adding questions, append to the `qData` array. Keep both languages in sync — each index in `oZ` must correspond to the same index in `oE`.
