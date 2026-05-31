@@ -18,14 +18,14 @@ A bilingual (Chinese/English) interactive quiz webpage — **"Comprehensive Core
 
 ### Usage
 
-Open `ytb.html` in any browser. No build step, no server required.
+Open `index.html` in any browser. No build step, no server required.
 
 ```bash
 # On macOS
-open ytb.html
+open index.html
 
 # On Windows
-start ytb.html
+start index.html
 ```
 
 ### Quiz Data Format
@@ -60,14 +60,14 @@ Each question in the `qData` array follows this structure:
 
 ### 使用
 
-用任意浏览器打开 `ytb.html` 即可，无需安装或构建。
+用任意浏览器打开 `index.html` 即可，无需安装或构建。
 
 ```bash
 # macOS
-open ytb.html
+open index.html
 
 # Windows
-start ytb.html
+start index.html
 ```
 
 ### 题目数据格式
